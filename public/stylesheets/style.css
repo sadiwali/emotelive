@@ -14,7 +14,46 @@
     text-align: center;
     margin: 20px 0;
     position: relative;
+    height: auto;
+    width: auto;
 }
+
+#p5canvas {
+    position: relative;
+    text-align: center;
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+#defaultCanvas0 {
+    position: relative;
+    margin: 0 auto;
+    width: auto;
+    height: auto;
+}
+
+#toplist {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color:rgb(235, 235, 235);
+    font-size: 1.5em;
+    padding: 0 5vw;
+}
+
+#top3 {
+    margin: 0;
+    padding: 0;
+}
+
+#bottom3 {
+    margin: 0;
+    padding: 0;
+}
+
 
 
 .glow1 {
@@ -23,10 +62,12 @@
 }
 
 @keyframes blink {
+
     0%,
     50% {
         opacity: 0;
     }
+
     20%,
     0% {
         opacity: 1;
@@ -58,11 +99,11 @@
 body {
     margin: auto;
     text-align: center;
-    background-color: rgb(25,25,25);
+    background-color: rgb(25, 25, 25);
     backface-visibility: hidden;
 }
 
-.SubmitInput{
+.SubmitInput {
     width: 30vw;
     max-height: 50px;
     min-height: 40px;
@@ -77,6 +118,7 @@ body {
     border-radius: 8px;
     background-color: rgb(235, 235, 235);
     box-shadow: 0 0 120px -15px #000000;
+    filter: drop-shadow(0px 0px 10px #ffffff);
 }
 
 .SubmitInput:hover {
@@ -154,12 +196,23 @@ body {
 }
 
 @keyframes blink {
+
     50%,
     0% {
         opacity: 0;
     }
+
     20%,
     0% {
         opacity: 1;
     }
+}
+
+.footer {
+    position: absolute;
+    bottom: 10px;
+    padding: 0 10px;
+    font-size: small;
+    color:rgb(235, 235, 235);
+    font-family: "VCR OSD MONO";
 }

@@ -13,18 +13,91 @@ name: string
 userId: UUID
 */
 
+var CLOSENESS_FACTOR = 0.05;
+var minDim;
+
+var viewMode = 0;
+/*
+0: default view mode, show all points and just the cube
+1: text view mode, similar people
+2: show just similar points and the cube
+3: text view mode, different people
+4: show just distant ponts and the cuve
+*/
+
 
 $(document).ready(function () {
-
   updateUsers();
   updateBackground();
-
-
-
   setInterval(updateUsers, 1000);
+  tapCount(false);
+  $(window).resize(resizeMapView)
 });
 
+function tapCount(increment) {
+  if (selfIndex == -1) return;
+  if (increment && userData.length >= 2) viewMode++;
 
+  if (viewMode >= 6) {
+    viewMode = 0;
+  }
+
+  if (viewMode == 0) {
+    $("#defaultCanvas0").show();
+    $("#toplist").hide();
+
+  } else if (viewMode == 1) {
+    $("#defaultCanvas0").hide();
+    $("#toplist").show();
+
+    if (closestWithinBubble.length == 0) {
+      $("#top3").text("No one feels the same as you today.")
+    } else {
+      $("#top3").text("These people feel the most similar to you today.")
+      var strBuild = "";
+      for (var i = 0; i < closestWithinBubble.length; i++) {
+        strBuild += closestWithinBubble[i].name + ", "
+      }
+      strBuild = strBuild.slice(0, strBuild.length - 2);
+      $("#bottom3").text(strBuild)
+    }
+
+  } else if (viewMode == 2) {
+    // no logic
+    $("#defaultCanvas0").show();
+    $("#toplist").hide();
+  } else if (viewMode == 3) {
+    $("#defaultCanvas0").hide();
+    $("#toplist").show();
+
+    if (furthestOutsideBubble.length == 0) {
+      $("#top3").text("Not enough people submitted their mood today.")
+    } else {
+
+      $("#top3").text("These people feel most different to you today.")
+      var strBuild = "";
+      for (var i = 0; i < furthestOutsideBubble.length; i++) {
+        strBuild += furthestOutsideBubble[i].name + ", "
+      }
+      strBuild = strBuild.slice(0, strBuild.length - 2);
+      $("#bottom3").text(strBuild)
+    }
+  } else if (viewMode == 4) {
+    // no logic
+    $("#defaultCanvas0").show();
+    $("#toplist").hide();
+  }
+
+  resizeMapView();
+
+}
+
+
+function resizeMapView() {
+  var minDim = Math.min($(window).width() / 1.5, $(window).height() / 1.5);
+  $("#p5canvas").css("height", minDim.toString() + "px");
+  // $("#p5canvas").css("height", minDim.toString() + "px");
+}
 
 function updateBackground() {
   r = $("#r").val();
@@ -32,9 +105,9 @@ function updateBackground() {
   b = $("#b").val();
   $("#nameInput").blur();
   if (selfIndex != -1) {
-    userData[selfIndex].r = r;
-    userData[selfIndex].g = g;
-    userData[selfIndex].b = b;
+    userData[selfIndex].r = $("#r").val();
+    userData[selfIndex].g = $("#g").val();
+    userData[selfIndex].b = $("#b").val();
   }
 }
 
@@ -46,21 +119,23 @@ function updateUsers() {
     userData.findIndex(function (item, i) {
       if (item.userId === Cookies.get("idCookie")) {
         selfIndex = i;
-        getSortedUserData();
-        updateBackground();
-        return;
+        userData[selfIndex].r = $("#r").val();
+        userData[selfIndex].g = $("#g").val();
+        userData[selfIndex].b = $("#b").val();
       }
+      getSortedUserData();
+      return;
     });
-
   });
 
 }
 
-function displayTop3() {
-  for (var i = 0; i <= 2; i++) {
-    if (i >= sortedUserData.length-1) break;
-    $("#" + i).text(sortedUserData[i].name + "(" + sortedUserData[i].distance.toFixed(2) + ")");
-  }
+function displayTop() {
+  // closest circle
+  // for (var i = 0; i <= 2; i++) {
+  //   if (i >= sortedUserData.length - 1) break;
+  //   $("#" + i).text(sortedUserData[i].name + "(" + sortedUserData[i].distance.toFixed(2) + ")");
+  // }
 }
 
 function componentToHex(c) {
@@ -77,7 +152,8 @@ function submit_emotions() {
   var g = $("#g").val();
   var b = $("#b").val();
   var name = $("#nameInput").val();
-
+  viewMode = 0;
+  tapCount(false)
 
   $.post("/process_emotion", {
     "r": r,
@@ -97,45 +173,58 @@ function preload() {
 
 }
 
-
-function showMatches() {
-  $("#p5canvas").hide();
-}
-
-function hideCanvas() {
-  $("#p5canvas").show();
-}
-
 function remap(value, low1, high1, low2, high2) {
   return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
 }
 
-function remapUserToPoint(ind, box) {
+function remapUserToPoint(list, ind, box) {
   remappedPoints = {}
-  remappedPoints.x = remap(userData[ind].r, 0, 255, -boxSize.x / 2, boxSize.x / 2);
-  remappedPoints.y = remap(userData[ind].g, 0, 255, -boxSize.y / 2, boxSize.y / 2);
-  remappedPoints.z = remap(userData[ind].b, 0, 255, -boxSize.z / 2, boxSize.z / 2);
+  remappedPoints.x = remap(list[ind].r, 0, 255, -boxSize.x / 2, boxSize.x / 2);
+  remappedPoints.y = remap(list[ind].g, 0, 255, -boxSize.y / 2, boxSize.y / 2);
+  remappedPoints.z = remap(list[ind].b, 0, 255, -boxSize.z / 2, boxSize.z / 2);
   return remappedPoints;
 }
 
-function getSortedUserData() {
+var closestWithinBubble = [];
+var furthestOutsideBubble = [];
 
-  sortedUserData = JSON.parse(JSON.stringify(userData));
-  for (var j = 0; j < sortedUserData.length; j++) {
-    if (selfIndex == j) {
-      sortedUserData[j].distance = -1;
+function getDistance(p1, p2) {
+
+  var a = p2.x - p1.x;
+  var b = p2.y - p1.y;
+  var c = p2.z - p1.z;
+
+  return Math.sqrt(a * a + b * b + c * c);
+}
+
+function getSortedUserData() {
+  closestWithinBubble = [];
+  furthestOutsideBubble = [];
+  if (selfIndex == -1) return;
+  for (var j = 0; j < userData.length; j++) {
+    if (selfIndex == j) continue;
+    var me = remapUserToPoint(userData, selfIndex, boxSize);
+    var other = remapUserToPoint(userData, j, boxSize);
+    var distance = getDistance(me, other);
+    if (distance <= minDim * CLOSENESS_FACTOR) {
+      // within circle
+      closestWithinBubble.push(userData[j]);
     } else {
-      var me = remapUserToPoint(selfIndex, boxSize);
-      var other = remapUserToPoint(j, boxSize);
-      sortedUserData[j].distance = dist(me.x, me.y, me.z, other.x, other.y, other.z);
+      // outside circle
+      furthestOutsideBubble.push(userData[j]);
     }
   }
-  // sort the distances
-  sortedUserData = sortedUserData.sort(function (a, b) {
+  // sort the distances for cloest group
+  closestWithinBubble = closestWithinBubble.sort(function (a, b) {
     return a.distance - b.distance;
   });
-  sortedUserData = sortedUserData.reverse();
-  displayTop3();
+
+  // sort the distances
+  furthestOutsideBubble = furthestOutsideBubble.sort(function (a, b) {
+    return a.distance - b.distance;
+  });
+  furthestOutsideBubble = furthestOutsideBubble.reverse();
+  displayTop();
 }
 
 
@@ -157,12 +246,12 @@ function setup() {
 
 function draw() {
   background(25);
-  var minDim = Math.min($(window).width()/1.5, $(window).height()/1.5);
+  minDim = Math.min($(window).width() / 1.5, $(window).height() / 1.5);
   resizeCanvas(minDim, minDim);
   boxSize = {
-    x: width/4,
-    y: width/4,
-    z: width/4
+    x: minDim / 4,
+    y: minDim / 4,
+    z: minDim / 4
   }
 
   push();
@@ -180,41 +269,80 @@ function draw() {
   translate(x, y, z);
   fill(r, g, b);
   noStroke();
-  sphere(width/75);
+  sphere(width / 75);
   pop();
 
-  var MAX_CONNECT_DIST = 100;
-  var sortedUserData = []; // userData sorted by distance
+  if (viewMode == 2) {
+    remappedCurrentPoint = remapUserToPoint(userData, selfIndex, boxSize);
+    for (var i = 0; i < closestWithinBubble.length; i++) {
+      // every other point
+      var remappedOtherPoint = remapUserToPoint(closestWithinBubble, i, boxSize);
+      // calculate distance between the points
+      var distance = getDistance(remappedCurrentPoint, remappedOtherPoint);
+      if (distance <= minDim * CLOSENESS_FACTOR) {
+        // draw line between points if distance is aunder a certain valuea
+        stroke(155, 155, 155, remap(distance, 0, minDim * CLOSENESS_FACTOR, 225, 100));
+        strokeWeight(remap(distance, 0, minDim * CLOSENESS_FACTOR, 5, 0.25));
+        line(remappedCurrentPoint.x, remappedCurrentPoint.y, remappedCurrentPoint.z, remappedOtherPoint.x, remappedOtherPoint.y, remappedOtherPoint.z);
+      }
 
-  for (var i = 0; i < userData.length; i++) {
-    // current point
-    remappedCurrentPoint = remapUserToPoint(i, boxSize);
-    var distancesToOtherPoints = [];
-    var newUserData
-    // every other point
-    if (selfIndex != -1 && i == selfIndex){
+      push();
+      translate(remappedOtherPoint.x, remappedOtherPoint.y, remappedOtherPoint.z);
+      fill(closestWithinBubble[i].r, closestWithinBubble[i].g, closestWithinBubble[i].b);
+      noStroke();
+      sphere(width / 300);
+      pop();
+    }
+
+  } else if (viewMode == 4) {
+    remappedCurrentPoint = remapUserToPoint(userData, selfIndex, boxSize);
+    for (var i = 0; i < furthestOutsideBubble.length; i++) {
+      // every other point
+      var remappedOtherPoint = remapUserToPoint(furthestOutsideBubble, i, boxSize);
+      // calculate distance between the points
+      var distance = getDistance(remappedCurrentPoint, remappedOtherPoint);
+      if (distance <= minDim * CLOSENESS_FACTOR) {
+        // draw line between points if distance is aunder a certain valuea
+        stroke(155, 155, 155, remap(distance, 0, minDim * CLOSENESS_FACTOR, 225, 100));
+        strokeWeight(remap(distance, 0, minDim * CLOSENESS_FACTOR, 5, 0.25));
+        line(remappedCurrentPoint.x, remappedCurrentPoint.y, remappedCurrentPoint.z, remappedOtherPoint.x, remappedOtherPoint.y, remappedOtherPoint.z);
+      }
+
+      push();
+      translate(remappedOtherPoint.x, remappedOtherPoint.y, remappedOtherPoint.z);
+      fill(furthestOutsideBubble[i].r, furthestOutsideBubble[i].g, furthestOutsideBubble[i].b);
+      noStroke();
+      sphere(width / 300);
+      pop();
+    }
+  } else if (viewMode == 0) {
+
+    for (var i = 0; i < userData.length; i++) {
+      // current point
+      remappedCurrentPoint = remapUserToPoint(userData, i, boxSize);
+      // every other point
       for (var j = 0; j < userData.length; j++) {
         if (i == j) continue; // don't compare point to itself
-        var remappedOtherPoint = remapUserToPoint(j, boxSize);
+        var remappedOtherPoint = remapUserToPoint(userData, j, boxSize);
         // calculate distance between the points
         var distance = dist(remappedCurrentPoint.x, remappedCurrentPoint.y, remappedCurrentPoint.z, remappedOtherPoint.x, remappedOtherPoint.y, remappedOtherPoint.z);
-        if (distance <= MAX_CONNECT_DIST) {
+        if (distance <= minDim * CLOSENESS_FACTOR) {
           // draw line between points if distance is aunder a certain valuea
-          stroke(155, 155, 155, remap(distance, 0, MAX_CONNECT_DIST, 225, 100));
-          strokeWeight(remap(distance, 0, MAX_CONNECT_DIST, 5, 0.25));
+          stroke(155, 155, 155, remap(distance, 0, minDim * CLOSENESS_FACTOR, 225, 100));
+          strokeWeight(remap(distance, 0, minDim * CLOSENESS_FACTOR, 5, 0.25));
           line(remappedCurrentPoint.x, remappedCurrentPoint.y, remappedCurrentPoint.z, remappedOtherPoint.x, remappedOtherPoint.y, remappedOtherPoint.z);
         }
-      }
-    }
-    
 
-    if (i == selfIndex) continue;
-    push();
-    translate(remappedCurrentPoint.x, remappedCurrentPoint.y, remappedCurrentPoint.z);
-    fill(userData[i].r, userData[i].g, userData[i].b);
-    noStroke();
-    sphere(width/300);
-    pop();
+      }
+
+      if (i == selfIndex) continue;
+      push();
+      translate(remappedCurrentPoint.x, remappedCurrentPoint.y, remappedCurrentPoint.z);
+      fill(userData[i].r, userData[i].g, userData[i].b);
+      noStroke();
+      sphere(width / 300);
+      pop();
+    }
 
   }
   stroke(50, 50, 50);
