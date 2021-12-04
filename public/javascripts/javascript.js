@@ -56,7 +56,6 @@ function updateUsers() {
 }
 
 function displayTop3() {
-  console.log(sortedUserData);
   for (var i = 0; i <= 2; i++) {
     if (i >= sortedUserData.length-1) break;
     $("#" + i).text(sortedUserData[i].name + "(" + sortedUserData[i].distance.toFixed(2) + ")");
@@ -121,7 +120,6 @@ function remapUserToPoint(ind, box) {
 function getSortedUserData() {
 
   sortedUserData = JSON.parse(JSON.stringify(userData));
-  console.log(sortedUserData);
   for (var j = 0; j < sortedUserData.length; j++) {
     if (selfIndex == j) {
       sortedUserData[j].distance = -1;
@@ -157,13 +155,13 @@ function setup() {
 
 
 function draw() {
-  background(255);
-  var minDim = Math.min($(window).width(), $(window).height());
-  resizeCanvas(minDim/2, minDim/2);
+  background(25);
+  var minDim = Math.min($(window).width()/1.5, $(window).height()/1.5);
+  resizeCanvas(minDim, minDim);
   boxSize = {
-    x: width/8,
-    y: width/8,
-    z: width/8
+    x: width/4,
+    y: width/4,
+    z: width/4
   }
 
   push();
@@ -181,7 +179,7 @@ function draw() {
   translate(x, y, z);
   fill(r, g, b);
   noStroke();
-  sphere(width/150);
+  sphere(width/75);
   pop();
 
   var MAX_CONNECT_DIST = 100;
@@ -193,14 +191,13 @@ function draw() {
     var distancesToOtherPoints = [];
     var newUserData
     // every other point
-    console.log(selfIndex);
     if (selfIndex != -1 && i == selfIndex){
       for (var j = 0; j < userData.length; j++) {
         if (i == j) continue; // don't compare point to itself
         var remappedOtherPoint = remapUserToPoint(j, boxSize);
         // calculate distance between the points
         var distance = dist(remappedCurrentPoint.x, remappedCurrentPoint.y, remappedCurrentPoint.z, remappedOtherPoint.x, remappedOtherPoint.y, remappedOtherPoint.z);
-        if (distance < MAX_CONNECT_DIST) {
+        if (distance <= MAX_CONNECT_DIST) {
           // draw line between points if distance is aunder a certain valuea
           stroke(155, 155, 155, remap(distance, 0, MAX_CONNECT_DIST, 225, 100));
           strokeWeight(remap(distance, 0, MAX_CONNECT_DIST, 5, 0.25));

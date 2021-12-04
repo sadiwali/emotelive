@@ -16,7 +16,7 @@ router.get("/", function (req, res, next) {
       return item.userId === req.cookies.idCookie;
     });
     if (existing_index == -1) {
-      console.log("no cookies found")
+
       res.clearCookie("prevInputs");
       res.clearCookie("prevInputs");
     }
@@ -31,15 +31,13 @@ router.get("/", function (req, res, next) {
 
   if ("prevInputs" in req.cookies) {
     prevInputs = JSON.parse(req.cookies.prevInputs);
-    console.log("cookies found:");
-    console.log(prevInputs)
     newuser = false
   } else {
-    console.log("cookie not found");
+
   }
 
   res.render("index", {
-    title: "E-Motion | Home",
+    title: "E-Mote | Home",
     savedInputs: prevInputs,
     newuser
   });
@@ -84,14 +82,14 @@ router.post("/process_emotion", function (req, res) {
     users[existing_index] = bare_emottion_object;
   }
 
-  console.log(bare_emottion_object);
+
 
   res.status(200).end();
 
 });
 
 router.post("/get_users", function (req, res) {
-  console.log(users);
+
   res.json(users).status(200).end();
 });
 
