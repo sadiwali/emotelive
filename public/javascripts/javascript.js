@@ -51,7 +51,8 @@ function tapCount(increment) {
     $("#toplist").show();
 
     if (closestWithinBubble.length == 0) {
-      $("#top3").text("No one feels the same as you today.")
+      $("#top3").text("No one feels the same as you today.");
+      $("#bottom3").text("");
     } else {
       $("#top3").text("These people feel the most similar to you today.")
       var strBuild = "";
@@ -72,6 +73,7 @@ function tapCount(increment) {
 
     if (furthestOutsideBubble.length == 0) {
       $("#top3").text("Not enough people submitted their mood today.")
+      $("#bottom3").text("");
     } else {
 
       $("#top3").text("These people feel most different to you today.")
