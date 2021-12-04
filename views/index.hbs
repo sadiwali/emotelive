@@ -5,7 +5,7 @@
 
         <div id="p5canvas"></div>
         <br>
-        <input class="NameInput" id="nameInput" type="text" value="" placeholder="Your Name" >
+        <input class="NameInput" id="nameInput" type="text" value="{{#if savedInputs.name}}{{savedInputs.name}}{{/if}}" placeholder="Your Name" >
         <div class="slidecontainer">
             <img class="animatedglow" src="stylesheets/NEW/sad.png">
             <input name="r" type="range" min="0" max="255" value="{{savedInputs.r}}" class="slider" id="r"

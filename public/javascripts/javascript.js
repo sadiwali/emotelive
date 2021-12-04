@@ -76,7 +76,7 @@ function submit_emotions() {
   var r = $("#r").val();
   var g = $("#g").val();
   var b = $("#b").val();
-  var name = $("#name").val();
+  var name = $("#nameInput").val();
 
 
   $.post("/process_emotion", {
