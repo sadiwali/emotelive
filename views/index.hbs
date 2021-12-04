@@ -1,0 +1,38 @@
+<div class="content">
+
+
+
+        {{#if newuser}}
+        <p>Hello, {{#if savedInputs.name}} {{savedInputs.name}} {{else}} you {{/if}}.</p>
+        {{else}}
+        <p>Welcome back, {{#if savedInputs.name}} {{savedInputs.name}} {{else}} you{{/if}}.</p>
+        {{/if}}   
+
+        <div id="p5canvas"></div>
+
+        {{#unless savedInputs.name}}
+        <input type="text" name="name" id="name">
+        {{/unless}}
+
+        <div class="slidecontainer">
+            <input name="r" type="range" min="0" max="255" value="{{savedInputs.r}}" class="slider" id="r" oninput="updateBackground()">
+        </div>
+        <div class="slidecontainer">
+            <input name="g" type="range" min="0" max="255" value="{{savedInputs.g}}" class="slider" id="g" oninput="updateBackground()">
+        </div>
+        <div class="slidecontainer">
+            <input name="b" type="range" min="0" max="255" value="{{savedInputs.b}}" class="slider" id="b" oninput="updateBackground()">
+        </div>
+        <input type="submit" value="OK" onclick="submit_emotions()">
+
+        <div id="top3container">
+            <ul id="top3list">
+                <li id="0"></li>
+                <li id="1"></li>
+                <li id="2"></li>
+            </ul>
+        </div>
+    
+
+
+</div>
