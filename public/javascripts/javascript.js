@@ -30,6 +30,7 @@ function updateBackground() {
   r = $("#r").val();
   g = $("#g").val();
   b = $("#b").val();
+  $("#nameInput").blur();
   if (selfIndex != -1) {
     userData[selfIndex].r = r;
     userData[selfIndex].g = g;
