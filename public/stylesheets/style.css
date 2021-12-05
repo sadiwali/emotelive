@@ -3,6 +3,9 @@
     src: url(VCR_OSD_MONO.ttf);
 }
 
+html{
+    user-select: none;
+}
 .content {
     align-content: center;
     font-family: "VCR OSD Mono", Icons;
