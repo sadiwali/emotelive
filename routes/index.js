@@ -9,7 +9,7 @@ router.get("/", function (req, res, next) {
   var newuser = true;
   if (!("idCookie" in req.cookies)) {
     res.cookie("idCookie", uuid.v1(), {
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 48 * 60 * 60 * 1000
     });
   } else {
     var existing_index = users.findIndex(function (item, i) {
@@ -43,6 +43,10 @@ router.get("/", function (req, res, next) {
   });
 });
 
+router.get("/data", function (req, res, next) {
+  res.json(users).status(200).end();
+});
+
 
 router.post("/process_emotion", function (req, res) {
 
@@ -65,7 +69,7 @@ router.post("/process_emotion", function (req, res) {
 
   // set the cookies
   res.cookie("prevInputs", JSON.stringify(bare_emottion_object), {
-    maxAge: 24 * 60 * 60 * 1000
+    maxAge: 48 * 60 * 60 * 1000
   });
 
   // inject the userID to bare emotion object
@@ -87,6 +91,7 @@ router.post("/process_emotion", function (req, res) {
   res.status(200).end();
 
 });
+
 
 router.post("/get_users", function (req, res) {
 
