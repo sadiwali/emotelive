@@ -38,7 +38,7 @@ function tapCount(increment) {
   if (selfIndex == -1) return;
   if (increment && userData.length >= 2) viewMode++;
 
-  if (viewMode >= 6) {
+  if (viewMode >= 5) {
     viewMode = 0;
   }
 
@@ -56,7 +56,7 @@ function tapCount(increment) {
     } else {
       $("#top3").text("These people feel the most similar to you today.")
       var strBuild = "";
-      for (var i = 0; i < closestWithinBubble.length; i++) {
+      for (var i = 0; i <=2 && i < closestWithinBubble.length; i++) {
         strBuild += closestWithinBubble[i].name + ", "
       }
       strBuild = strBuild.slice(0, strBuild.length - 2);
@@ -78,7 +78,7 @@ function tapCount(increment) {
 
       $("#top3").text("These people feel most different to you today.")
       var strBuild = "";
-      for (var i = 0; i < furthestOutsideBubble.length; i++) {
+      for (var i = 0; i <= 2 &&i < furthestOutsideBubble.length; i++) {
         strBuild += furthestOutsideBubble[i].name + ", "
       }
       strBuild = strBuild.slice(0, strBuild.length - 2);
@@ -96,7 +96,7 @@ function tapCount(increment) {
 
 
 function resizeMapView() {
-  var minDim = Math.min($(window).width() / 1.5, $(window).height() / 1.5);
+  minDim = Math.min($(window).width(), $(window).height())/2;
   $("#p5canvas").css("height", minDim.toString() + "px");
   // $("#p5canvas").css("height", minDim.toString() + "px");
 }
@@ -248,7 +248,7 @@ function setup() {
 
 function draw() {
   background(25);
-  minDim = Math.min($(window).width() / 1.5, $(window).height() / 1.5);
+  minDim = Math.min($(window).width(), $(window).height())/2;
   resizeCanvas(minDim, minDim);
   boxSize = {
     x: minDim / 4,

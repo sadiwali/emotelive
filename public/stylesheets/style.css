@@ -91,8 +91,8 @@
     filter: drop-shadow(0px 0px 10px #ffffff);
     animation: 20s infinite blink;
     width: 4vw;
-    max-width: 40px;
-    max-height: 40px;
+    max-width: 30px;
+    max-height: 30px;
     height: 4vw;
 }
 
@@ -105,13 +105,14 @@ body {
 
 .SubmitInput {
     width: 30vw;
+    max-width: 200px;
     max-height: 50px;
     min-height: 40px;
     margin-top: 40px;
     height: 8vh;
     line-height: 2;
     padding: 0px;
-    font-size: 1.5em;
+    font-size: 1.25em;
     font-family: "VCR OSD Mono", Icons;
     text-align: center;
     text-shadow: -1px 0px 1px lawngreen;
@@ -137,13 +138,15 @@ body {
 
 .NameInput {
     margin-bottom: 40px;
+    margin-top: 30px;
     background-color: rgba(255, 255, 255, 0.53);
-    font-size: 2rem;
+    font-size: 1.25em;
     font-family: "VCR OSD Mono", Icons;
     text-align: left;
     padding: 2px 20px 2px 20px;
-    height: 4vh;
-    max-height: 80px;
+    height: 3.5vh;
+    min-height: 30px;
+    max-height: 40px;
     width: 60%;
     max-width: 300px;
     text-shadow: 1px 0px 1px lawngreen;
@@ -165,6 +168,7 @@ body {
     -webkit-appearance: none;
     align-content: 50%;
     width: 50vw;
+    max-width: 400px;
     height: 0.5vh;
     max-height: 20px;
     background: #313131;
@@ -182,6 +186,7 @@ body {
     width: 4vw;
     max-width: 20px;
     height: 3vh;
+    max-height: 20px;
     background: #7031ff;
     cursor: grabbing;
     border: 2px solid lawngreen;
@@ -209,10 +214,11 @@ body {
 }
 
 .footer {
-    position: absolute;
-    bottom: 10px;
+    position: relative;
     padding: 0 10px;
     font-size: small;
+    margin-top: 25px;
+    margin-bottom: 50px;
     color:rgb(235, 235, 235);
     font-family: "VCR OSD MONO";
 }
